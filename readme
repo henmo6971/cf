@@ -51,5 +51,38 @@ if you run the command again you should receive a different IP
 
 ####Congrats is working ALB routing traffic to ec2 instances which are in ASG. #######
 
+#######   ANALYSIS and Improvement PLAN    ############
+
+Availability issues:
+
+      There is not HA, if 1b availability zone goes down, website is down.
+      ALB is a multi AZ, so i selected 1b and 1a. ALB's target sit on one AZ because ASG is confined within this AZ 1b only.
+
+     Same kind of issues with NAT and Bastion, if we lose AZ 1a, we lose access  to the Bastion, as well as ASG instances will not be abe to connect to Nat gateway for outbount access if needed.
+
+What Security Gaps exist:
+
+     The first i can think of is HTTPS normally this is standard way. traffic is pretty much unencrypted now. 
+     
+     Terraform destroy could easily undo all was built. For some resources, we should enable "enable_deletion_protection"
+  
+     Bastion is exposed to use only SSH-KEY, we can harden the bastion 2 or use access via ssm.
+
+     we can also implement a firewall, but could be costly.
+
+Cost Optimization opportunities:
+     
+     As it was just deployed, there is no point to have 2 instances in ASG. Since EC2s are in the same AZ, we can set the minimum 1, not recommeneded, we should improve this deployed infra and reset ASG min size to 2 again.
+
+     We are using already a lowest cost ec2 in ASG and bastion.
+
+Improvement Plan:
+
+     - 1) would improve the arquitecture, Most standard way for this deployed arquitecture, 6 subnets, 2 public subnets for management, one subnet on different AZ, example: us-east-1a and 1b. 2 private application subnets spanning accross 1a and 1b AZs. and the same, 2 subnets for backend.
+
+    - 2) Would at least create at least 1 NAT gatway in public Subnet. this would allow servers to be able to access outbound. this has been implemented already.
+
+	
+
 
 
