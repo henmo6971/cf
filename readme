@@ -1,34 +1,59 @@
+------Runbook-style notes-------- 
+How would someone else deploy and operate your environment?
 
+        1) create a private/public key with ssh-keygen
+	2) create s3 backend
+	3) deploy IaC for the challenge.
+	
+	#note Complete one step at a time.
+1)
+#########   Create private/public key used to login to Bastion instance ######
 To make sure you get acccess to Bastion:
 (linux based) OS make it easier,  make sure you have created a public and private key.
 ssh-keygen and enter for defaults most likely  would create in ~/.ssh/id_ed25519 and ~/.ssh/id_ed25519.pub
 
 if not default please update file with the right public key file name
 modules/workloads/main.tf:  public_key = file("~/.ssh/<filename>.pub"
+#######################################################################################
+2)
+######  create s3 backend    ########
+clone repo
+https://github.com/henmo6971/cf.git
+cd cf, cd s3
+run: terraform init, terraform plan; then terraform apply
+########################################################
+3)
+###### Create the infra ###############
+cd ../, on cf directory
+run: terraform init ; terraform plan; terraform apply
 
-
-
-**if above completed, ready to run terraform.**
-
-you are ready to run terraform init the terraform plan and apply.
-Code was tested and successfully met the requirements of challenge, well in my opinion.
-
-Terraform apply will prompt you for the IP to allow access to bastion.
+Terraform plan/apply will prompt you for the IP to allow access to bastion.
 you can use 0.0.0.0/0 or your IP x.x.x.x/32
+######################################################
+
+How would you restore data if the S3 bucket were deleted? 
+	you have a couple of options here.
+	- if S3 replication, or bacvkup  then you are safe :)
+	- if there is a copy of the latest state file.
+	- WORST CASE, rebuild the terraform state by importing resources
+
+---------------- END of RUN BOOK NOTES ------------
 
 
-once terraform creates all resources:
+once terraform creates all resources, lets navigate it.
 
+
+#######################################
+Navigating through the new environment.
 ssh ec2-user@<Public IP BASTION ec2>
 
 **Some extra to check httpd config**
 You could also access via ssh to your ec2 instances in the ASG, not recommended, but i did for troubleshooting purposes.
-cp from your terminal ~/.ssh/id_ed25519 to the bastion and name <file.key> and set chmod 400 to the new file.
+cp from your terminal ~/.ssh/id_ed25519 to the bastion and name <file>.key and set chmod 400 to the new file.
 
 then to ssh to private instances:
-ssh -i file.key ec2-user@IP
+ssh -i <file>.key ec2-user@IP
 
-####################
 Test Load balancer:
 ####################
 To make it easier testing access to website created in ASG.
@@ -51,36 +76,71 @@ if you run the command again you should receive a different IP
 
 ####Congrats is working ALB routing traffic to ec2 instances which are in ASG. #######
 
-#######   ANALYSIS and Improvement PLAN    ############
+------------   ANALYSIS and Improvement PLAN  -----------------
 
-Availability issues:
+
+1) Analysis:
+*******Availability issues:
 
       There is not HA, if 1b availability zone goes down, website is down.
       ALB is a multi AZ, so i selected 1b and 1a. ALB's target sit on one AZ because ASG is confined within this AZ 1b only.
 
      Same kind of issues with NAT and Bastion, if we lose AZ 1a, we lose access  to the Bastion, as well as ASG instances will not be abe to connect to Nat gateway for outbount access if needed.
 
-What Security Gaps exist:
+*******What Security Gaps exist:
 
-     The first i can think of is HTTPS normally this is standard way. traffic is pretty much unencrypted now. 
+     The first i can think of is HTTPS normally this is standard way for ALB traffic. It is pretty much unencrypted now. 
      
-     Terraform destroy could easily undo all was built. For some resources, we should enable "enable_deletion_protection"
+     "Terraform destroy" command  could easily destrot key resources. For some resources, we should enable "enable_deletion_protection"
   
      Bastion is exposed to use only SSH-KEY, we can harden the bastion 2 or use access via ssm.
 
      we can also implement a firewall, but could be costly.
 
-Cost Optimization opportunities:
+********Cost Optimization opportunities:
      
-     As it was just deployed, there is no point to have 2 instances in ASG. Since EC2s are in the same AZ, we can set the minimum 1, not recommeneded, we should improve this deployed infra and reset ASG min size to 2 again.
+     As it was just deployed, there is no point to have 2 instances in ASG. Since EC2s are in the same AZ, we can set the minimum 1, not recommeneded, we should improve this deployed infra and set ASG be configned within 2 AZs.
 
      We are using already a lowest cost ec2 in ASG and bastion.
 
-Improvement Plan:
+------------- END OF ANALYSYS -------------------------
 
-     - 1) would improve the arquitecture, Most standard way for this deployed arquitecture, 6 subnets, 2 public subnets for management, one subnet on different AZ, example: us-east-1a and 1b. 2 private application subnets spanning accross 1a and 1b AZs. and the same, 2 subnets for backend.
+2) Improvement Plan:
 
-    - 2) Would at least create at least 1 NAT gatway in public Subnet. this would allow servers to be able to access outbound. this has been implemented already.
+*******Improvement CHANGES:
+
+	Implement Terraform remote backend:
+Although not explicitly required in the challenge, using an S3 backend is essenCtial for maintainability, resilience, and team collaboration.
+(Already implemented as part of the requested improvements.)
+
+	Redesign the network architecture  
+The current layout does not follow standard AWS multi‑tier VPC design. A proper structure should include at least six subnets:
+
+	2 public management subnets (AZs 1a and 1b)
+
+	2 private application subnets (AZs 1a and 1b)
+
+	2 private backend subnets (AZs 1a and 1b)
+This ensures isolation, scalability, and high availability across the environment.
+Implementing as mentioned above would give us a chancde to re-arquitect this env and fixing the ASG issue just sitting in one AZ.
+
+
+	Deploy a NAT Gateway  
+At least one NAT Gateway should exist in a public subnet to allow private instances outbound internet access for updates, package installation, and external API calls.
+(Already implemented as part of the requested improvements.)
+
+	Replace SSH bastion access with SSM Session Manager  
+Session Manager eliminates the need for public IPs, inbound security group rules, and SSH keys. It also provides audit logging via CloudWatch or S3, significantly improving security posture.
+
+
+******** Priority List:
+
+	1) terraform Backend
+	2) would re-arquitect the nework
+
+--------- END of IMPROVEMENTS to consider ----------
+
+
 
 	
 

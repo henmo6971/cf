@@ -15,7 +15,7 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket       = "henmo-terraform-state"
+    bucket       = "coal-terraform-state"
     key          = "global/terraform-mod.tfstate"
     region       = "us-east-1"
     encrypt      = true
