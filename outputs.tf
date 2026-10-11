@@ -16,14 +16,14 @@ output "nat_gateway_public_ip" {
 output "alb_dns_name" {
   description = "Internal DNS name of the Application load balancer."
   value       = module.workloads.alb_dns_name
-}
+  }
 
 output "bastion_instance_id" {
   description = "Instance ID of the bastion host."
   value       = module.workloads.bastion_instance_id
-}
+  }
 
 output "application_asg_name" {
   description = "Name of the Application Auto Scaling Group."
   value       = module.workloads.application_asg_name
-}
+  }

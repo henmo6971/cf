@@ -12,3 +12,13 @@ terraform {
 provider "aws" {
   region = var.aws_region
 }
+
+terraform {
+  backend "s3" {
+    bucket       = "henmo-terraform-state"
+    key          = "global/terraform-mod.tfstate"
+    region       = "us-east-1"
+    encrypt      = true
+    use_lockfile = true   # native S3 locking (Terraform 1.10+)
+  }
+}

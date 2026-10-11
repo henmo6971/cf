@@ -73,11 +73,11 @@ variable "bastion_ssh_public_key" {
 variable "dns_zone_name" {
   description = "Existing private Route 53 hosted zone name."
   type        = string
-  default     = "coalfiretest.com"
+  default     = "testcf.com"
 }
 
 variable "alb_record_name" {
   description = "Full DNS record name that should CNAME to the ALB."
   type        = string
-  default     = "app.coalfiretest.com"
+  default     = "app.testcf.com"
 }

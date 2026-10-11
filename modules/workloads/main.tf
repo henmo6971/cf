@@ -6,7 +6,7 @@ data "aws_ssm_parameter" "amazon_linux_2023" {
 
 resource "aws_key_pair" "bastion" {
   key_name   = "${var.name_prefix}-bastion"
-  public_key = var.bastion_ssh_public_key
+  public_key = file("~/.ssh/id_ed25519.pub")
 }
 
 resource "aws_security_group" "bastion" {
@@ -70,30 +70,6 @@ resource "aws_security_group" "application" {
   description = "No external traffic as requested"
   vpc_id      = var.vpc_id
 
-  ingress {
-    description     = "HTTP from the ALB"
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb.id]
-  }
-
-  ingress {
-    description     = "SSH from the bastion"
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [aws_security_group.bastion.id]
-  }
-
-  egress {
-    description = "Allow outbound traffic for package installation and updates"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = {
     Name = "${var.name_prefix}-application-sg"
   }
@@ -101,6 +77,36 @@ resource "aws_security_group" "application" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_security_group_rule" "application_http_from_alb" {
+  type                     = "ingress"
+  description              = "HTTP from the ALB"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.application.id
+  source_security_group_id = aws_security_group.alb.id
+}
+
+resource "aws_security_group_rule" "application_ssh_from_bastion" {
+  type                     = "ingress"
+  description              = "SSH from the bastion"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.application.id
+  source_security_group_id = aws_security_group.bastion.id
+}
+
+resource "aws_security_group_rule" "application_egress" {
+  type              = "egress"
+  description       = "Allow outbound traffic for package installation and updates"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.application.id
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_launch_template" "application" {
@@ -213,22 +219,6 @@ resource "aws_security_group" "alb" {
   description = "Internal ALB for the Application tier"
   vpc_id      = var.vpc_id
 
-  ingress {
-    description = "HTTP from within the VPC"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr]
-  }
-
-  egress {
-    description     = "HTTP to the Application tier"
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.application.id]
-  }
-
   tags = {
     Name = "${var.name_prefix}-alb-sg"
   }
@@ -236,6 +226,26 @@ resource "aws_security_group" "alb" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_security_group_rule" "alb_http_from_vpc" {
+  type              = "ingress"
+  description       = "HTTP from within the VPC"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  security_group_id = aws_security_group.alb.id
+  cidr_blocks       = [var.vpc_cidr]
+}
+
+resource "aws_security_group_rule" "alb_http_to_application" {
+  type                     = "egress"
+  description              = "HTTP to the Application tier"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.alb.id
+  source_security_group_id = aws_security_group.application.id
 }
 
 resource "aws_lb" "application" {

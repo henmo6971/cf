@@ -22,3 +22,19 @@ module "workloads" {
   dns_zone_name            = var.dns_zone_name
   alb_record_name          = var.alb_record_name
 }
+
+resource  "aws_route53_zone" "private" {
+  name = var.dns_zone_name
+  vpc {
+     vpc_id = module.network.vpc_id
+  }
+
+}
+
+output "route53_zone_id" {
+  value = aws_route53_zone.private.zone_id
+}
+
+output "route53_zone_name" {
+  value = aws_route53_zone.private.name
+}
