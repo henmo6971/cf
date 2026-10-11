@@ -298,9 +298,8 @@ resource "aws_lb_listener" "application" {
 }
 
 # --- DNS ---
-
 data "aws_route53_zone" "this" {
-  name         = var.dns_zone_name
+  zone_id      = var.dns_zone_id
   private_zone = true
 }
 

@@ -1,3 +1,12 @@
+resource  "aws_route53_zone" "private" {
+  name = var.dns_zone_name
+  vpc {
+     vpc_id = module.network.vpc_id
+  } 
+ 
+} 
+
+
 module "network" {
   source = "./modules/network"
 
@@ -19,16 +28,9 @@ module "workloads" {
   backend_subnet_id        = module.network.subnet_ids["backend"]
   bastion_allowed_ssh_cidr = var.bastion_allowed_ssh_cidr
   bastion_ssh_public_key   = var.bastion_ssh_public_key
-  dns_zone_name            = var.dns_zone_name
+  dns_zone_name            = aws_route53_zone.private.name
+  dns_zone_id              = aws_route53_zone.private.zone_id
   alb_record_name          = var.alb_record_name
-}
-
-resource  "aws_route53_zone" "private" {
-  name = var.dns_zone_name
-  vpc {
-     vpc_id = module.network.vpc_id
-  }
-
 }
 
 output "route53_zone_id" {
@@ -38,3 +40,10 @@ output "route53_zone_id" {
 output "route53_zone_name" {
   value = aws_route53_zone.private.name
 }
+#output "route53_zone_id" {
+#  value = aws_route53_zone.private.zone_id
+#  }
+
+#output "route53_zone_name" {
+#  value = aws_route53_zone.private.name
+#}

@@ -40,8 +40,11 @@ variable "bastion_ssh_public_key" {
 }
 
 variable "dns_zone_name" {
-  description = "Existing private Route 53 hosted zone name."
-  type        = string
+  type = string
+}
+
+variable "dns_zone_id" {
+  type = string
 }
 
 variable "alb_record_name" {
