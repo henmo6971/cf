@@ -4,7 +4,8 @@
 * SORRY, I HAVE A MAIN QUESTION BUT I STARTED TO WORK ON THIS OVER THE
 * WEEKEND PRETTY MUCH.
 
-* CURRENT STATE 
+* CURRENT STATE
+  ![CHALLENGE-DIAGRAM.jpg]
 Subnet	CIDR	AZ index	Used by
 management (public)	10.1.1.0/24	0	Bastion, NAT
 application (private)	10.1.2.0/24	1	ASG (only subnet), ALB
