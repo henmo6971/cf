@@ -3,8 +3,15 @@
 *************************************************************************
 * SORRY, I HAVE A MAIN QUESTION BUT I STARTED TO WORK ON THIS OVER THE
 * WEEKEND PRETTY MUCH.
-* QUESTION: SHOULD I HAVE FIXED THE ISSUE WITH AVAILABILITY ZONES?
-* I JUST WENT WITH ORIGINAL REQUEST, CHANGE TO IMPROVE THIS PENDING.
+
+* CURRENT STATE 
+Subnet	CIDR	AZ index	Used by
+management (public)	10.1.1.0/24	0	Bastion, NAT
+application (private)	10.1.2.0/24	1	ASG (only subnet), ALB
+backend (private)	10.1.3.0/24	0	ALB
+
+backend (private)   10.1.3.0/24 0   ALB , it was done on purpose to be able to create ALB
+since there is no other application subnet in another AZ. Improvements section in detail.
 *************************************************************************
 
 ## Runbook-style notes
@@ -139,7 +146,7 @@ Congratulations! The ALB is routing traffic to EC2 instances in the ASG.
 #### Availability issues
 
 - There is no HA. If AZ `1b` goes down, the website is down.
-- The ALB is multi-AZ, but the target group is confined to one AZ (`1b`) because the ASG is only in that zone.
+- The ALB not able to be created since we dont have 2 Application subnets, one on each AZ, Target group is confined to one AZ (`1b`) because the ASG is only in that zone.
 - The same issue applies to the NAT gateway and Bastion. If AZ `1a` is lost, access to the Bastion is lost and ASG instances may lose outbound internet access through the NAT gateway.
 
 #### Security gaps
@@ -187,8 +194,7 @@ Congratulations! The ALB is routing traffic to EC2 instances in the ASG.
 
 1. Terraform backend
 2. Re-architect the network
-
----
+3. Create compliant AMI
 
 ## Summary
 
