@@ -1,0 +1,834 @@
+terraform plan 
+var.bastion_allowed_ssh_cidr
+  CIDR block allowed to SSH into the bastion (e.g. your admin IP /32).
+
+  Enter a value: 0.0.0.0/0
+
+module.network.data.aws_availability_zones.available: Reading...
+module.workloads.data.aws_ssm_parameter.amazon_linux_2023: Reading...
+module.workloads.data.aws_ssm_parameter.amazon_linux_2023: Read complete after 1s [id=/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64]
+module.network.data.aws_availability_zones.available: Read complete after 1s [id=us-east-1]
+
+Terraform used the selected providers to generate the following execution plan. Resource
+actions are indicated with the following symbols:
+  + create
+ <= read (data resources)
+
+Terraform will perform the following actions:
+
+  # aws_route53_zone.private will be created
+  + resource "aws_route53_zone" "private" {
+      + arn                 = (known after apply)
+      + comment             = "Managed by Terraform"
+      + force_destroy       = false
+      + id                  = (known after apply)
+      + name                = "testcf.com"
+      + name_servers        = (known after apply)
+      + primary_name_server = (known after apply)
+      + tags_all            = (known after apply)
+      + zone_id             = (known after apply)
+
+      + vpc {
+          + vpc_id     = (known after apply)
+          + vpc_region = (known after apply)
+        }
+    }
+
+  # module.network.aws_eip.nat will be created
+  + resource "aws_eip" "nat" {
+      + allocation_id        = (known after apply)
+      + arn                  = (known after apply)
+      + association_id       = (known after apply)
+      + carrier_ip           = (known after apply)
+      + customer_owned_ip    = (known after apply)
+      + domain               = "vpc"
+      + id                   = (known after apply)
+      + instance             = (known after apply)
+      + ipam_pool_id         = (known after apply)
+      + network_border_group = (known after apply)
+      + network_interface    = (known after apply)
+      + private_dns          = (known after apply)
+      + private_ip           = (known after apply)
+      + ptr_record           = (known after apply)
+      + public_dns           = (known after apply)
+      + public_ip            = (known after apply)
+      + public_ipv4_pool     = (known after apply)
+      + tags                 = {
+          + "Name" = "three-tier-nat-eip"
+        }
+      + tags_all             = {
+          + "Name" = "three-tier-nat-eip"
+        }
+      + vpc                  = (known after apply)
+    }
+
+  # module.network.aws_internet_gateway.this will be created
+  + resource "aws_internet_gateway" "this" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + owner_id = (known after apply)
+      + tags     = {
+          + "Name" = "three-tier-igw"
+        }
+      + tags_all = {
+          + "Name" = "three-tier-igw"
+        }
+      + vpc_id   = (known after apply)
+    }
+
+  # module.network.aws_nat_gateway.this will be created
+  + resource "aws_nat_gateway" "this" {
+      + allocation_id                      = (known after apply)
+      + association_id                     = (known after apply)
+      + connectivity_type                  = "public"
+      + id                                 = (known after apply)
+      + network_interface_id               = (known after apply)
+      + private_ip                         = (known after apply)
+      + public_ip                          = (known after apply)
+      + secondary_private_ip_address_count = (known after apply)
+      + secondary_private_ip_addresses     = (known after apply)
+      + subnet_id                          = (known after apply)
+      + tags                               = {
+          + "Name" = "three-tier-nat"
+        }
+      + tags_all                           = {
+          + "Name" = "three-tier-nat"
+        }
+    }
+
+  # module.network.aws_route_table.private will be created
+  + resource "aws_route_table" "private" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = [
+          + {
+              + cidr_block                 = "0.0.0.0/0"
+              + nat_gateway_id             = (known after apply)
+                # (11 unchanged attributes hidden)
+            },
+        ]
+      + tags             = {
+          + "Name" = "three-tier-private-rt"
+        }
+      + tags_all         = {
+          + "Name" = "three-tier-private-rt"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.network.aws_route_table.public will be created
+  + resource "aws_route_table" "public" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = [
+          + {
+              + cidr_block                 = "0.0.0.0/0"
+              + gateway_id                 = (known after apply)
+                # (11 unchanged attributes hidden)
+            },
+        ]
+      + tags             = {
+          + "Name" = "three-tier-public-rt"
+        }
+      + tags_all         = {
+          + "Name" = "three-tier-public-rt"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.network.aws_route_table_association.management will be created
+  + resource "aws_route_table_association" "management" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.network.aws_route_table_association.private["application"] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.network.aws_route_table_association.private["backend"] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.network.aws_subnet.this["application"] will be created
+  + resource "aws_subnet" "this" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "us-east-1b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.1.2.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"       = "three-tier-application"
+          + "Tier"       = "Application"
+          + "Visibility" = "Private"
+        }
+      + tags_all                                       = {
+          + "Name"       = "three-tier-application"
+          + "Tier"       = "Application"
+          + "Visibility" = "Private"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.network.aws_subnet.this["backend"] will be created
+  + resource "aws_subnet" "this" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "us-east-1a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.1.3.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"       = "three-tier-backend"
+          + "Tier"       = "Backend"
+          + "Visibility" = "Private"
+        }
+      + tags_all                                       = {
+          + "Name"       = "three-tier-backend"
+          + "Tier"       = "Backend"
+          + "Visibility" = "Private"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.network.aws_subnet.this["management"] will be created
+  + resource "aws_subnet" "this" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "us-east-1a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.1.1.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = true
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"       = "three-tier-management"
+          + "Tier"       = "Management"
+          + "Visibility" = "Public"
+        }
+      + tags_all                                       = {
+          + "Name"       = "three-tier-management"
+          + "Tier"       = "Management"
+          + "Visibility" = "Public"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.network.aws_vpc.this will be created
+  + resource "aws_vpc" "this" {
+      + arn                                  = (known after apply)
+      + cidr_block                           = "10.1.0.0/16"
+      + default_network_acl_id               = (known after apply)
+      + default_route_table_id               = (known after apply)
+      + default_security_group_id            = (known after apply)
+      + dhcp_options_id                      = (known after apply)
+      + enable_dns_hostnames                 = true
+      + enable_dns_support                   = true
+      + enable_network_address_usage_metrics = (known after apply)
+      + id                                   = (known after apply)
+      + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + tags                                 = {
+          + "Name" = "three-tier-vpc"
+        }
+      + tags_all                             = {
+          + "Name" = "three-tier-vpc"
+        }
+    }
+
+  # module.workloads.data.aws_route53_zone.this will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_route53_zone" "this" {
+      + arn                        = (known after apply)
+      + caller_reference           = (known after apply)
+      + comment                    = (known after apply)
+      + id                         = (known after apply)
+      + linked_service_description = (known after apply)
+      + linked_service_principal   = (known after apply)
+      + name                       = (known after apply)
+      + name_servers               = (known after apply)
+      + primary_name_server        = (known after apply)
+      + private_zone               = true
+      + resource_record_set_count  = (known after apply)
+      + tags                       = (known after apply)
+      + vpc_id                     = (known after apply)
+      + zone_id                    = (known after apply)
+    }
+
+  # module.workloads.aws_autoscaling_group.application will be created
+  + resource "aws_autoscaling_group" "application" {
+      + arn                              = (known after apply)
+      + availability_zones               = (known after apply)
+      + default_cooldown                 = (known after apply)
+      + desired_capacity                 = 2
+      + force_delete                     = false
+      + force_delete_warm_pool           = false
+      + health_check_grace_period        = 300
+      + health_check_type                = "EC2"
+      + id                               = (known after apply)
+      + ignore_failed_scaling_activities = false
+      + load_balancers                   = (known after apply)
+      + max_size                         = 6
+      + metrics_granularity              = "1Minute"
+      + min_size                         = 2
+      + name                             = (known after apply)
+      + name_prefix                      = "three-tier-application-"
+      + predicted_capacity               = (known after apply)
+      + protect_from_scale_in            = false
+      + service_linked_role_arn          = (known after apply)
+      + target_group_arns                = (known after apply)
+      + vpc_zone_identifier              = (known after apply)
+      + wait_for_capacity_timeout        = "10m"
+      + warm_pool_size                   = (known after apply)
+
+      + availability_zone_distribution (known after apply)
+
+      + capacity_reservation_specification (known after apply)
+
+      + instance_refresh {
+          + strategy = "Rolling"
+
+          + preferences {
+              + max_healthy_percentage       = 100
+              + min_healthy_percentage       = 50
+              + scale_in_protected_instances = "Ignore"
+              + skip_matching                = false
+              + standby_instances            = "Ignore"
+            }
+        }
+
+      + launch_template {
+          + id      = (known after apply)
+          + name    = (known after apply)
+          + version = "$Latest"
+        }
+
+      + mixed_instances_policy (known after apply)
+
+      + tag {
+          + key                 = "Name"
+          + propagate_at_launch = true
+          + value               = "three-tier-application"
+        }
+
+      + traffic_source (known after apply)
+    }
+
+  # module.workloads.aws_instance.bastion will be created
+  + resource "aws_instance" "bastion" {
+      + ami                                  = (sensitive value)
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "t3.micro"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "three-tier-bastion"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = (known after apply)
+      + tags                                 = {
+          + "Name" = "three-tier-bastion"
+        }
+      + tags_all                             = {
+          + "Name" = "three-tier-bastion"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = (known after apply)
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options {
+          + http_endpoint               = "enabled"
+          + http_protocol_ipv6          = "disabled"
+          + http_put_response_hop_limit = (known after apply)
+          + http_tokens                 = "required"
+          + instance_metadata_tags      = (known after apply)
+        }
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = true
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 8
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.workloads.aws_key_pair.bastion will be created
+  + resource "aws_key_pair" "bastion" {
+      + arn             = (known after apply)
+      + fingerprint     = (known after apply)
+      + id              = (known after apply)
+      + key_name        = "three-tier-bastion"
+      + key_name_prefix = (known after apply)
+      + key_pair_id     = (known after apply)
+      + key_type        = (known after apply)
+      + public_key      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFD6jTSXNuupKp8CMVja9YPZkh0oakneGv3wn6nXgeng henmo@Henmo"
+      + tags_all        = (known after apply)
+    }
+
+  # module.workloads.aws_launch_template.application will be created
+  + resource "aws_launch_template" "application" {
+      + arn                    = (known after apply)
+      + default_version        = (known after apply)
+      + id                     = (known after apply)
+      + image_id               = (sensitive value)
+      + instance_type          = "t3.micro"
+      + key_name               = "three-tier-bastion"
+      + latest_version         = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = "three-tier-application-"
+      + tags_all               = (known after apply)
+      + user_data              = "IyEvYmluL2Jhc2gNCnNldCAtZXV4byBwaXBlZmFpbA0KDQpkbmYgaW5zdGFsbCAteSBodHRwZA0KUFJJVkFURV9JUD0kKGhvc3RuYW1lIC1JIHwgYXdrICd7cHJpbnQgJDF9JykNCg0KY2F0ID4gL3Zhci93d3cvaHRtbC9pbmRleC5odG1sIDw8SFRNTA0KPCFkb2N0eXBlIGh0bWw+DQo8aHRtbCBsYW5nPSJlbiI+DQogIDxoZWFkPg0KICAgIDxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4NCiAgICA8dGl0bGU+QXBwbGljYXRpb24gU2VydmVyPC90aXRsZT4NCiAgPC9oZWFkPg0KICA8Ym9keT4NCiAgICA8aDE+QW1hem9uIExpbnV4IDIwMjM8L2gxPg0KICAgIDxwPkluc3RhbmNlIHByaXZhdGUgSVA6ICR7UFJJVkFURV9JUH08L3A+DQogIDwvYm9keT4NCjwvaHRtbD4NCkhUTUwNCg0Kc3lzdGVtY3RsIGVuYWJsZSAtLW5vdyBodHRwZA0K"
+      + vpc_security_group_ids = (known after apply)
+
+      + block_device_mappings {
+          + device_name = "/dev/xvda"
+
+          + ebs {
+              + delete_on_termination      = "true"
+              + encrypted                  = "true"
+              + iops                       = (known after apply)
+              + throughput                 = (known after apply)
+              + volume_initialization_rate = (known after apply)
+              + volume_size                = 8
+              + volume_type                = "gp3"
+            }
+        }
+
+      + metadata_options {
+          + http_endpoint               = "enabled"
+          + http_protocol_ipv6          = (known after apply)
+          + http_put_response_hop_limit = (known after apply)
+          + http_tokens                 = "required"
+          + instance_metadata_tags      = (known after apply)
+        }
+
+      + tag_specifications {
+          + resource_type = "instance"
+          + tags          = {
+              + "Name" = "three-tier-application"
+            }
+        }
+      + tag_specifications {
+          + resource_type = "volume"
+          + tags          = {
+              + "Name" = "three-tier-application"
+            }
+        }
+    }
+
+  # module.workloads.aws_lb.application will be created
+  + resource "aws_lb" "application" {
+      + arn                                                          = (known after apply)
+      + arn_suffix                                                   = (known after apply)
+      + client_keep_alive                                            = 3600
+      + desync_mitigation_mode                                       = "defensive"
+      + dns_name                                                     = (known after apply)
+      + drop_invalid_header_fields                                   = false
+      + enable_deletion_protection                                   = false
+      + enable_http2                                                 = true
+      + enable_tls_version_and_cipher_suite_headers                  = false
+      + enable_waf_fail_open                                         = false
+      + enable_xff_client_port                                       = false
+      + enable_zonal_shift                                           = false
+      + enforce_security_group_inbound_rules_on_private_link_traffic = (known after apply)
+      + id                                                           = (known after apply)
+      + idle_timeout                                                 = 60
+      + internal                                                     = true
+      + ip_address_type                                              = (known after apply)
+      + load_balancer_type                                           = "application"
+      + name                                                         = (known after apply)
+      + name_prefix                                                  = "threet"
+      + preserve_host_header                                         = false
+      + security_groups                                              = (known after apply)
+      + subnets                                                      = (known after apply)
+      + tags                                                         = {
+          + "Name" = "three-tier-alb"
+        }
+      + tags_all                                                     = {
+          + "Name" = "three-tier-alb"
+        }
+      + vpc_id                                                       = (known after apply)
+      + xff_header_processing_mode                                   = "append"
+      + zone_id                                                      = (known after apply)
+
+      + subnet_mapping (known after apply)
+    }
+
+  # module.workloads.aws_lb_listener.application will be created
+  + resource "aws_lb_listener" "application" {
+      + arn                                                                   = (known after apply)
+      + id                                                                    = (known after apply)
+      + load_balancer_arn                                                     = (known after apply)
+      + port                                                                  = 80
+      + protocol                                                              = "HTTP"
+      + routing_http_request_x_amzn_mtls_clientcert_header_name               = (known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_issuer_header_name        = (known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_leaf_header_name          = (known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_serial_number_header_name = (known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_subject_header_name       = (known after apply)
+      + routing_http_request_x_amzn_mtls_clientcert_validity_header_name      = (known after apply)
+      + routing_http_request_x_amzn_tls_cipher_suite_header_name              = (known after apply)
+      + routing_http_request_x_amzn_tls_version_header_name                   = (known after apply)
+      + routing_http_response_access_control_allow_credentials_header_value   = (known after apply)
+      + routing_http_response_access_control_allow_headers_header_value       = (known after apply)
+      + routing_http_response_access_control_allow_methods_header_value       = (known after apply)
+      + routing_http_response_access_control_allow_origin_header_value        = (known after apply)
+      + routing_http_response_access_control_expose_headers_header_value      = (known after apply)
+      + routing_http_response_access_control_max_age_header_value             = (known after apply)
+      + routing_http_response_content_security_policy_header_value            = (known after apply)
+      + routing_http_response_server_enabled                                  = (known after apply)
+      + routing_http_response_strict_transport_security_header_value          = (known after apply)
+      + routing_http_response_x_content_type_options_header_value             = (known after apply)
+      + routing_http_response_x_frame_options_header_value                    = (known after apply)
+      + ssl_policy                                                            = (known after apply)
+      + tags_all                                                              = (known after apply)
+      + tcp_idle_timeout_seconds                                              = (known after apply)
+
+      + default_action {
+          + order            = (known after apply)
+          + target_group_arn = (known after apply)
+          + type             = "forward"
+        }
+
+      + mutual_authentication (known after apply)
+    }
+
+  # module.workloads.aws_lb_target_group.application will be created
+  + resource "aws_lb_target_group" "application" {
+      + arn                                = (known after apply)
+      + arn_suffix                         = (known after apply)
+      + connection_termination             = (known after apply)
+      + deregistration_delay               = "300"
+      + id                                 = (known after apply)
+      + ip_address_type                    = (known after apply)
+      + lambda_multi_value_headers_enabled = false
+      + load_balancer_arns                 = (known after apply)
+      + load_balancing_algorithm_type      = (known after apply)
+      + load_balancing_anomaly_mitigation  = (known after apply)
+      + load_balancing_cross_zone_enabled  = (known after apply)
+      + name                               = (known after apply)
+      + name_prefix                        = "app-"
+      + port                               = 80
+      + preserve_client_ip                 = (known after apply)
+      + protocol                           = "HTTP"
+      + protocol_version                   = (known after apply)
+      + proxy_protocol_v2                  = false
+      + slow_start                         = 0
+      + tags                               = {
+          + "Name" = "three-tier-application-tg"
+        }
+      + tags_all                           = {
+          + "Name" = "three-tier-application-tg"
+        }
+      + target_type                        = "instance"
+      + vpc_id                             = (known after apply)
+
+      + health_check {
+          + enabled             = true
+          + healthy_threshold   = 2
+          + interval            = 30
+          + matcher             = "200"
+          + path                = "/"
+          + port                = "traffic-port"
+          + protocol            = "HTTP"
+          + timeout             = 5
+          + unhealthy_threshold = 2
+        }
+
+      + stickiness (known after apply)
+
+      + target_failover (known after apply)
+
+      + target_group_health (known after apply)
+
+      + target_health_state (known after apply)
+    }
+
+  # module.workloads.aws_route53_record.alb will be created
+  + resource "aws_route53_record" "alb" {
+      + allow_overwrite = (known after apply)
+      + fqdn            = (known after apply)
+      + id              = (known after apply)
+      + name            = "app.testcf.com"
+      + records         = (known after apply)
+      + ttl             = 300
+      + type            = "CNAME"
+      + zone_id         = (known after apply)
+    }
+
+  # module.workloads.aws_security_group.alb will be created
+  + resource "aws_security_group" "alb" {
+      + arn                    = (known after apply)
+      + description            = "Internal ALB for the Application tier"
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = "three-tier-alb-"
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "three-tier-alb-sg"
+        }
+      + tags_all               = {
+          + "Name" = "three-tier-alb-sg"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.workloads.aws_security_group.application will be created
+  + resource "aws_security_group" "application" {
+      + arn                    = (known after apply)
+      + description            = "No external traffic as requested"
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = "three-tier-application-"
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "three-tier-application-sg"
+        }
+      + tags_all               = {
+          + "Name" = "three-tier-application-sg"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.workloads.aws_security_group.bastion will be created
+  + resource "aws_security_group" "bastion" {
+      + arn                    = (known after apply)
+      + description            = "Bastion host in the Management subnet"
+      + egress                 = [
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = "Allow outbound traffic"
+              + from_port        = 0
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "-1"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 0
+            },
+        ]
+      + id                     = (known after apply)
+      + ingress                = [
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = "SSH from admin"
+              + from_port        = 22
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 22
+            },
+        ]
+      + name                   = (known after apply)
+      + name_prefix            = "three-tier-bastion-"
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "three-tier-bastion-sg"
+        }
+      + tags_all               = {
+          + "Name" = "three-tier-bastion-sg"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.workloads.aws_security_group_rule.alb_http_from_vpc will be created
+  + resource "aws_security_group_rule" "alb_http_from_vpc" {
+      + cidr_blocks              = [
+          + "10.1.0.0/16",
+        ]
+      + description              = "HTTP from within the VPC"
+      + from_port                = 80
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + security_group_rule_id   = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 80
+      + type                     = "ingress"
+    }
+
+  # module.workloads.aws_security_group_rule.alb_http_to_application will be created
+  + resource "aws_security_group_rule" "alb_http_to_application" {
+      + description              = "HTTP to the Application tier"
+      + from_port                = 80
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + security_group_rule_id   = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 80
+      + type                     = "egress"
+    }
+
+  # module.workloads.aws_security_group_rule.application_egress will be created
+  + resource "aws_security_group_rule" "application_egress" {
+      + cidr_blocks              = [
+          + "0.0.0.0/0",
+        ]
+      + description              = "Allow outbound traffic for package installation and updates"
+      + from_port                = 0
+      + id                       = (known after apply)
+      + protocol                 = "-1"
+      + security_group_id        = (known after apply)
+      + security_group_rule_id   = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 0
+      + type                     = "egress"
+    }
+
+  # module.workloads.aws_security_group_rule.application_http_from_alb will be created
+  + resource "aws_security_group_rule" "application_http_from_alb" {
+      + description              = "HTTP from the ALB"
+      + from_port                = 80
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + security_group_rule_id   = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 80
+      + type                     = "ingress"
+    }
+
+  # module.workloads.aws_security_group_rule.application_ssh_from_bastion will be created
+  + resource "aws_security_group_rule" "application_ssh_from_bastion" {
+      + description              = "SSH from the bastion"
+      + from_port                = 22
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + security_group_rule_id   = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 22
+      + type                     = "ingress"
+    }
+
+Plan: 29 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + alb_dns_name          = (known after apply)
+  + application_asg_name  = (known after apply)
+  + bastion_instance_id   = (known after apply)
+  + nat_gateway_public_ip = (known after apply)
+  + route53_zone_id       = (known after apply)
+  + route53_zone_name     = "testcf.com"
+  + subnet_ids            = {
+      + application = (known after apply)
+      + backend     = (known after apply)
+      + management  = (known after apply)
+    }
+  + vpc_id                = (known after apply)
+
+───────────────────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't guarantee to
+take exactly these actions if you run "terraform apply" now.
+
