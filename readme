@@ -106,10 +106,12 @@ if you run the command again you should receive a different IP
      we can also implement a firewall, but could be costly.
 
 ********Cost Optimization opportunities:
-     
-     As it was just deployed, there is no point to have 2 instances in ASG. Since EC2s are in the same AZ, we can set the minimum 1, not recommeneded, we should improve this deployed infra and set ASG be configned within 2 AZs.
 
      We are using already a lowest cost ec2 in ASG and bastion.
+
+******** Operational Shortcomings:
+
+     There are more resources to be added to this infrastructure such as Cludwatch, Monitoring, Firewall, etc..
 
 ------------- END OF ANALYSYS -------------------------
 
