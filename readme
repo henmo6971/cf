@@ -111,7 +111,7 @@ if you run the command again you should receive a different IP
 
 ******** Operational Shortcomings:
 
-     There are more resources to be added to this infrastructure such as Cludwatch, Monitoring, Firewall, etc..
+     There are more resources to be added to this infrastructure such as Cloudwatch, Monitoring, Firewall, Logging-enabled,  etc..
 
 ------------- END OF ANALYSYS -------------------------
 
