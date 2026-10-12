@@ -148,6 +148,7 @@ Congratulations! The ALB is routing traffic to EC2 instances in the ASG.
 - `terraform destroy` could easily destroy key resources. For some resources, we should enable deletion protection.
 - The Bastion is exposed via SSH key authentication; we can harden it or use SSM instead.
 - A firewall could also be implemented, though it may be costly.
+- A custom hardened AMI should be built and maintained to enforce baseline security controls (CIS/STIG alignment, patch level consistency, logging configuration, and removal of unnecessary services) to ensure the compute layer complies with FedRAMP Moderate/High standards.
 
 #### Cost optimization opportunities
 
