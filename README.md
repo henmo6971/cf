@@ -181,7 +181,7 @@ Congratulations! The ALB is routing traffic to EC2 instances in the ASG.
     - 2 private application subnets (AZs 1a and 1b)
     - 2 private backend subnets (AZs 1a and 1b)
   - This would improve isolation, scalability, and high availability across the environment.
-  - It would also address the ASG issue of being placed in a single AZ.
+  - It would also address ALB (require 2 application subnets) to be created properly and ASG issue of being placed in a single AZ.
 
 - Deploy a NAT gateway
   - At least one NAT Gateway should exist in a public subnet to allow private instances to access outbound internet resources for updates, package installation, and external APIs.
